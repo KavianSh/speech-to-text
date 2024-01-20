@@ -1,0 +1,15 @@
+librosa
+youtube_dl
+streamlit
+transformers
+httplib2
+torch
+torchaudio
+sentencepiece
+tokenizers
+pyannote.audio
+pyannote.core
+pydub
+lightning
+lightning-lite
+pytorch-lightning
