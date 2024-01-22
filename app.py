@@ -330,7 +330,7 @@ def transcription(stt_tokenizer, stt_model, filename, uploaded_file=None):
 
                 # Non Diarization Mode
                 filename = "../data/" + filename
-                print("Filepath:", filename)
+                # print("Filepath:", filename)
 
                 
                 # Transcribe process with Non Diarization Mode
