@@ -1,4 +1,6 @@
 # Models
+from fileinput import filename
+from sunau import AUDIO_FILE_ENCODING_ADPCM_G721
 import torch
 from transformers import Wav2Vec2Processor, HubertForCTC, Wav2Vec2Tokenizer
 
@@ -193,6 +195,9 @@ def config():
     # Will not be executed with AI Deploy because it is indicated in the DockerFile of the app
     if not os.path.exists("../data"):
         os.makedirs("../data")
+
+    #print("File path:", filename)
+    #print("File exists:", os.path.exists(filename))
     
     # Display Text and CSS
     st.title("Speech to Text App 📝")
