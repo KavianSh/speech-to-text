@@ -1,6 +1,5 @@
 # Models
 from fileinput import filename
-from sunau import AUDIO_FILE_ENCODING_ADPCM_G721
 import torch
 from transformers import Wav2Vec2Processor, HubertForCTC, Wav2Vec2Tokenizer
 
@@ -16,7 +15,27 @@ from datetime import timedelta
 import os
 import streamlit as st
 import time
+import speech_recognition as sr
 
+def convert_speech_to_text():
+    recognizer = sr.Recognizer()
+
+    with sr.Microphone() as source:
+        print("Say something:")
+        recognizer.adjust_for_ambient_noise(source)
+        audio = recognizer.listen(source)
+
+    try:
+        text = recognizer.recognize_google(audio)
+        print("You said:", text)
+        return text
+    except sr.UnknownValueError:
+        print("Could not understand audio")
+        return ""
+    except sr.RequestError as e:
+        print(f"Error with the API request; {e}")
+        return ""
+    
 def transcribe_audio_part(filename, stt_model, stt_tokenizer, myaudio, sub_start, sub_end, index):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     try:
@@ -50,6 +69,15 @@ def transcribe_audio_part(filename, stt_model, stt_tokenizer, myaudio, sub_start
         time.sleep(3)
         st.stop()
 
+def transcript_from_mic(stt_tokenizer, stt_model):
+    st.write("Recording audio...")
+    text = convert_speech_to_text()
+    if text != "":
+        st.subheader("Transcription from Microphone")
+        st.write(text)
+    else:
+        st.warning("No text was transcribed.")
+    
 def detect_silences(audio):
 
     # Get Decibels (dB) so silences detection depends on the audio instead of a fixed value
@@ -360,7 +388,7 @@ def transcription(stt_tokenizer, stt_model, filename, uploaded_file=None):
 
 if __name__ == '__main__':
     config()
-    choice = st.radio("Features", ["By a video URL", "By uploading a file"]) 
+    choice = st.radio("Features", ["By a video URL", "By uploading a file", "From Microphone"]) 
 
     stt_tokenizer, stt_model = load_models()
     if choice == "By a video URL":
@@ -368,4 +396,7 @@ if __name__ == '__main__':
 
     elif choice == "By uploading a file":
         transcript_from_file(stt_tokenizer, stt_model)
+        
+    elif choice == "From Microphone":
+        transcript_from_mic(stt_tokenizer, stt_model)
 
